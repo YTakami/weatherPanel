@@ -1,10 +1,56 @@
 // KPR Script file
 var stride = 16;
 var data = {
-			location: "Tokyo",
+			location: "Palis",
 			attribution: "openweathermap.org"
 };
 var state = [];
+var bitmap = [
+	[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+	[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+	[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+	[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+	[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+	[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+	[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+	[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+	[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+	[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+	[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+	[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+	[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+	[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+];
+var bitmap_rain = [
+	[0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0],
+	[0,0,0,0,1,1,0,0,0,1,1,0,0,0,0,0],
+	[0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,0],
+	[0,0,1,0,0,0,0,0,0,0,0,0,1,0,0,0],
+	[0,0,0,1,1,1,1,1,1,1,1,1,0,0,0,0],
+	[0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0],
+	[0,0,0,0,0,1,0,1,0,0,0,0,0,0,0,0],
+	[0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0]
+];
+var bitmap_cloud = [
+	[0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0],
+	[0,0,0,0,0,1,0,0,0,1,0,0,0,0,0,0],
+	[0,0,0,0,1,0,0,0,0,1,1,1,0,0,0,0],
+	[0,0,1,1,0,0,0,0,1,0,0,0,1,0,0,0],
+	[0,1,0,0,1,0,0,0,0,0,0,0,0,1,0,0],
+	[0,1,0,0,0,0,0,0,0,0,0,0,0,1,0,0],
+	[0,0,1,0,0,0,0,0,0,0,0,0,1,0,0,0],
+	[0,0,0,1,1,1,1,1,1,1,1,1,0,0,0,0]
+];
+var bitmap_fine = [
+	[0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0],
+	[0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0],
+	[0,0,0,0,0,0,1,0,0,0,1,0,0,0,0,0],
+	[0,0,0,0,1,0,1,0,0,0,1,0,1,0,0,0],
+	[0,0,0,0,0,0,1,0,0,0,1,0,0,0,0,0],
+	[0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0],
+	[0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0],
+	[0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0]
+];
 
 var Startbehavior = function(){
 }
@@ -30,9 +76,15 @@ Startbehavior.prototype = Object.create(Object.prototype, {
 				if ( items.length > 0 ) {
 					node = items.item( 0 );
 					value = node.getAttribute( "number" );
-					if(value == 800 & value == 801) weather = 1;//fine;
-					else if(value == 802 & value == 803 && value == 804) weather = 2;//cloud;
+					//trace(value);
+					if(value == 800 || value == 801) weather = 1;//fine;
+					else if(value == 802 || value == 803 || value == 804) {
+					weather = 2;//cloud;
+					//trace(weather);
+					}
 					else weather = 0;//rain;
+					
+					//trace(node.getAttribute( "value" ));
 				}
 				items = document.getElementsByTagName( "temperature" );
 				if ( items.length > 0 ) {
@@ -50,21 +102,25 @@ Startbehavior.prototype = Object.create(Object.prototype, {
 				var wmark;
 				switch(weather){
 					case 1: 
-			 			wmark= Files.readText(mergeURI(application.url, "./weather/fine.txt"));
+			 			//wmark= Files.readText(mergeURI(application.url, "./weather/fine2.txt"));
+			 			wmark = bitmap_fine;
 			 			break;
 			 		case 2:
-			 			wmark = Files.readText(mergeURI(application.url, "./weather/cloud.txt"));
+			 			//wmark = Files.readText(mergeURI(application.url, "./weather/cloud2.txt"));
+			 			wmark = bitmap_cloud;
 			 			break;
 			 		case 0:
-			 			wmark = Files.readText(mergeURI(application.url, "./weather/rain.txt"));
+			 			//wmark = Files.readText(mergeURI(application.url, "./weather/rain2.txt"));
+			 			wmark = bitmap_rain;
 			 			break;
 				}
 				
-				for(var y=0;y<10;y++){
+				for(var y=0;y<8;y++){
 					for(var x=0;x<stride;x++){
-						var line = wmark.slice(x+y*stride,x+y*stride+1);
-						if(line>0) state[x+y*stride] = true;
-						else state[x+y*stride] = false;
+						//var line = wmark.slice(x+y*stride,x+y*stride+1);
+						bitmap[y][x] = wmark[y][x];
+						//if(line>0) bitmap[y][x] = 1;
+						//else state[x+y*stride] = 0;
 					}
 				}
 				
@@ -137,12 +193,12 @@ Startbehavior.prototype = Object.create(Object.prototype, {
 				for(var y=0;y<5;y++){
 					for(var x=0;x<3;x++){
 						var line = no10.slice(x+y*3,x+y*3+1);
-						if(line>0) state[(x+3)+(y+11)*stride] = true;
-						else state[(x+3)+(y+11)*stride] = false;
+						if(line>0) bitmap[y+9][x+3] = 1;//state[(x+3)+(y+9)*stride] = true;
+						else bitmap[y+9][x+3] = 0;//state[(x+3)+(y+9)*stride] = false;
 						
 						var line1 = no1.slice(x+y*3,x+y*3+1);
-						if(line1>0) state[(x+7)+(y+11)*stride] = true;
-						else state[(x+7)+(y+11)*stride] = false;
+						if(line1>0) bitmap[y+9][x+7] = 1;//state[(x+7)+(y+9)*stride] = true;
+						else bitmap[y+9][x+7] = 0;//state[(x+7)+(y+9)*stride] = false;
 					}
 				}
 				
@@ -150,8 +206,8 @@ Startbehavior.prototype = Object.create(Object.prototype, {
 				for(var y=0;y<3;y++){
 					for(var x=0;x<3;x++){
 						var line = dot.slice(x+y*3,x+y*3+1);
-						if(line>0) state[(x+11)+(y+11)*stride] = true;
-						else state[(x+11)+(y+11)*stride] = false;
+						if(line>0) bitmap[y+9][x+11] = 1;//state[(x+11)+(y+9)*stride] = true;
+						else bitmap[y+9][x+7] = 0;//state[(x+11)+(y+9)*stride] = false;
 					}
 				}
 			}
@@ -163,21 +219,44 @@ var Panel = function () {
 }
 Panel.prototype = Object.create(Object.prototype, {
 	onTouchBegan: {
-		value: function(p) {		
+		value: function(p) {
+			var x = p.variant%stride;
+			var y = Math.floor(p.variant/stride);
+			if(bitmap[y][x] == 0) {
+				p.skin = new Skin("black");;
+				bitmap[y][x] = 1;
+			}
+			else {
+				p.skin = new Skin("white");
+				bitmap[y][x] = 0;
+			}
+			/*	
 			if(state[p.variant]){
 				state[p.variant] = false;
 			}else{
 				state[p.variant] = true;
 			}
+			*/
 		}
 	},
 	onTimeChanged: {
 		value: function(p){
+			var x = p.variant%stride;
+			var y = Math.floor(p.variant/stride);
+			if(bitmap[y][x] == 1){
+				p.skin = new Skin("black");
+				//bitmap[y][x] = 1;
+			}else{
+				p.skin = new Skin("white");
+				//bitmap[y][x] = 0;
+			}
+			/*
 			if(state[p.variant]){
 				p.skin = new Skin("red");
 			}else{
 				p.skin = new Skin("white");
 			}
+			*/
 		}
 	},
 });
@@ -185,11 +264,11 @@ Panel.prototype = Object.create(Object.prototype, {
 // KPR Script file
 var build = function(container) {
 	container.skin = new Skin("blue");
-    for(var i=0;i<stride*stride;i++) state[i] = false; 
+    for(var i=0;i<stride*(stride-2);i++) state[i] = false; 
 
 	var l=10;	
 	for(var i=0;i<stride;i++){
-		for(var j=0;j<stride;j++){
+		for(var j=0;j<stride-2;j++){
 			var p = new Content({left:i*l + 80,top:j*l + 20, width:l,height:l },new Skin("white"));
 			p.behavior = new Panel();
 			p.active = true;
